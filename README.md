@@ -3,6 +3,10 @@ Foxy.nvim
 </h1>
 
 <p align="center">
+	foxy.nvim is a setup for the text editor by terminal, neovim, focused mostly for web development with a beautiful aesthetic dark themes and obviously rice :rice:
+</p>
+
+<p align="center">
 	<a href="https://github.com/AngelYahir/foxy.nvim/stargazers">
 		<img alt="Stargazers" src="https://img.shields.io/github/stars/AngelYahir/foxy.nvim?style=for-the-badge&logo=starship&color=C9CBFF&logoColor=D9E0EE&labelColor=302D41"></a>
 	<a href="https://github.com/catppuccin/catppuccin/releases/latest">
