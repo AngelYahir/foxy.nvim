@@ -1,14 +1,29 @@
-require('plugins/telescope')
+vim.notify = require("notify")
+require("mason").setup()
+require('plugins/neotree')
 require('plugins/lualine')
-require('plugins/notify')
-require('plugins/identBlackline')
-require('plugins/bufferline')
-require('plugins/dashboard')
-require('plugins/treesitter')
-require('plugins/lsp')
-require('plugins/cmp-lua')
+require("ibl").setup()
+require("bufferline").setup{}
+require("oil").setup()
+require("colorizer").setup()
+require("plugins/telescope")
+require("plugins/scroll")
+require("plugins/noice")
+require("plugins/indent")
+require("plugins/dashboard")
+require("plugins/treesitter")
+require("plugins/lsp")
+require("plugins/transparent")
+require("plugins/presence")
+require("markview").setup({
+    modes = { "n", "i", "no", "c" },
+    hybrid_modes = { "i" },
 
-vim.g.minimap_width = 10
-vim.g.minimap_auto_start = 1
-vim.g.minimap_auto_start_win_enter = 1
-
+    -- This is nice to have
+    callbacks = {
+        on_enable = function (_, win)
+            vim.wo[win].conceallevel = 2;
+            vim.wo[win].concealcursor = "nc";
+        end
+    }
+})

@@ -12,69 +12,126 @@
 
 --]]
 
--- Catppuccin --
+local user_config_file = vim.fn.stdpath('config') .. '/user_config.lua'
+local user_config = dofile(user_config_file)
+vim.cmd('colorscheme ' .. user_config.theme)
 
--- local catppuccin = require("catppuccin")
--- vim.cmd[[colorscheme catppuccin]]
+function ChangeTheme(new_theme, save)
+  vim.cmd('colorscheme ' .. new_theme)
+  if save then
+    user_config.theme = new_theme
+    local config_file = io.open(user_config_file, 'w')
+    config_file:write("return " .. vim.inspect(user_config))
+    config_file:close()
+    vim.notify('Tema cambiado a: ' .. new_theme, vim.log.levels.INFO, { title = "Neovim" })
+  end
+end
 
---     end     --
+local default_themes = {
+  "default", "desert", "elflord", "evening", "industry",
+  "koehler", "morning", "murphy", "pablo", "peachpuff",
+  "ron", "shine", "slate", "torte", "blue", "darkblue", "delek"
+}
 
--- TokyoNight --
+function ListThemes()
+  local themes = vim.fn.getcompletion('', 'color')
+  local filtered_themes = {}
 
-local tokyonight = require("tokyonight")
-vim.g.tokyonight_style = "night"
-vim.cmd[[colorscheme tokyonight]]
+  for _, theme in ipairs(themes) do
+    if not vim.tbl_contains(default_themes, theme) then
+      table.insert(filtered_themes, theme)
+    end
+  end
 
---     end     --
+  table.sort(filtered_themes)
 
--- Kanagawa --
+  return filtered_themes
+end
 
--- vim.cmd[[colorscheme kanagawa]]
+local actions = require('telescope.actions')
+local action_state = require('telescope.actions.state')
+local pickers = require('telescope.pickers')
+local finders = require('telescope.finders')
+local conf = require('telescope.config').values
 
---    end    --
+function ThemePicker()
+  local themes = ListThemes()
 
--- Night Fox --
+  pickers.new({
+    layout_config = {
+      width = 0.3,
+      height = 0.4,
+      prompt_position = "top", 
+    },
+    layout_strategy = "center",
+    prompt_title = "Select a theme",
+  }, {
+    finder = finders.new_table {
+      results = themes
+    },
+    sorter = conf.generic_sorter({}),
+    attach_mappings = function(prompt_bufnr, map)
 
---vim.cmd[[colorscheme nightfox]]
+      local function preview_theme()
+        local selection = action_state.get_selected_entry()
+        ChangeTheme(selection[1], false) 
+      end
 
---   end    --
+      map('i', '<CR>', function()
+        local selection = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        ChangeTheme(selection[1], true)
+      end)
 
--- Rose Pine --
+      map('n', '<CR>', function()
+        local selection = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        ChangeTheme(selection[1], true)
+      end)
 
--- require('rose-pine').setup({
--- 	---@usage 'main'|'moon'
--- 	dark_variant = 'main',
--- 	bold_vert_split = false,
--- 	dim_nc_background = false,
--- 	disable_background = false,
--- 	disable_float_background = false,
--- 	disable_italics = false,
--- 	---@usage string hex value or named color from rosepinetheme.com/palette
--- 	groups = {
--- 		border = 'highlight_med',
--- 		comment = 'muted',
--- 		link = 'iris',
--- 		punctuation = 'subtle',
---
--- 		error = 'love',
--- 		hint = 'iris',
--- 		info = 'foam',
--- 		warn = 'gold',
---
--- 		headings = {
--- 			h1 = 'iris',
--- 			h2 = 'foam',
--- 			h3 = 'rose',
--- 			h4 = 'gold',
--- 			h5 = 'pine',
--- 			h6 = 'foam',
--- 		}
--- 		-- or set all headings at once
--- 		-- headings = 'subtle'
--- 	}
--- })
---
--- -- set colorscheme after options
---vim.cmd[[colorscheme rose-pine]]
+      map('i', '<C-j>', function()
+        actions.move_selection_next(prompt_bufnr)
+        preview_theme()
+      end)
 
---    end    --
+      map('i', '<C-k>', function()
+        actions.move_selection_previous(prompt_bufnr)
+        preview_theme()
+      end)
+
+      map('n', 'j', function()
+        actions.move_selection_next(prompt_bufnr)
+        preview_theme()
+      end)
+
+      map('n', 'k', function()
+        actions.move_selection_previous(prompt_bufnr)
+        preview_theme()
+      end)
+
+      map('i', '<Down>', function()
+        actions.move_selection_next(prompt_bufnr)
+        preview_theme()
+      end)
+
+      map('i', '<Up>', function()
+        actions.move_selection_previous(prompt_bufnr)
+        preview_theme()
+      end)
+
+      map('n', '<Down>', function()
+        actions.move_selection_next(prompt_bufnr)
+        preview_theme()
+      end)
+
+      map('n', '<Up>', function()
+        actions.move_selection_previous(prompt_bufnr)
+        preview_theme()
+      end)
+
+      return true
+    end,
+  }):find()
+end
+
+vim.api.nvim_create_user_command('PickTheme', ThemePicker, {})

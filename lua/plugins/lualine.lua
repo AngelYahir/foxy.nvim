@@ -1,48 +1,48 @@
 -- Bubbles config for lualine
 -- Author: lokesh-krishna
 -- MIT license, see LICENSE for more details.
-
+-- Catpuccin theme adaption c:
 -- stylua: ignore
 local colors = {
-  purple   = '#845EC2',
-  pink   = '#FFC4C9',
-  black  = '#191724',
-  white  = '#c6c6c6',
-  red    = '#ff5189',
-  violet = '#d183e8',
-  grey   = '#303030',
+  blue   = '#89b4fa',
+  cyan   = '#94e2d5',
+  black  = '#11111b',
+  white  = '#cdd6f4',
+  red    = '#f38ba8',
+  violet = '#cea8f6',
+  grey   = '#6c7086',
 }
 
 local bubbles_theme = {
   normal = {
     a = { fg = colors.black, bg = colors.violet },
     b = { fg = colors.white, bg = colors.grey },
-    c = { fg = colors.black, bg = colors.black },
+    c = { fg = colors.white },
   },
 
-  insert = { a = { fg = colors.black, bg = colors.purple } },
-  visual = { a = { fg = colors.black, bg = colors.pink } },
+  insert = { a = { fg = colors.black, bg = colors.blue } },
+  visual = { a = { fg = colors.black, bg = colors.cyan } },
   replace = { a = { fg = colors.black, bg = colors.red } },
 
   inactive = {
     a = { fg = colors.white, bg = colors.black },
     b = { fg = colors.white, bg = colors.black },
-    c = { fg = colors.black, bg = colors.black },
+    c = { fg = colors.white },
   },
 }
 
 require('lualine').setup {
   options = {
     theme = bubbles_theme,
-    component_separators = '|',
+    component_separators = '',
     section_separators = { left = '', right = '' },
   },
   sections = {
-    lualine_a = {
-      { 'mode', separator = { left = '' }, right_padding = 2 },
-    },
+    lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
     lualine_b = { 'filename', 'branch' },
-    lualine_c = { 'fileformat' },
+    lualine_c = {
+      '%=', --[[ add your center compoentnts here in place of this comment ]]
+    },
     lualine_x = {},
     lualine_y = { 'filetype', 'progress' },
     lualine_z = {

@@ -1,42 +1,69 @@
-local lsp_installer = require("nvim-lsp-installer")
-lsp_installer.on_server_ready(function(server)
-  local opts = {}
-   if server.name == "sumneko_lua" then
-     opts = {
-       settings = {
-         Lua = {
-           diagnostics = {
-             globals = { 'vim', 'use' }
-           },
-           --workspace = {
-             -- Make the server aware of Neovim runtime files
-             --library = {[vim.fn.expand('$VIMRUNTIME/lua')] = true, [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true}
-           --}
-         }
-       }
-     }
-   end
+local lspconfig = require('lspconfig')
 
-   if server.name == "emmet_ls" then
-     opts.filetypes = {"html", "css", "blade", "typescriptreact", "php"}
-   end
-   if server.name == "html" then
-     opts.filetypes = {"html", "typescriptreact"}
-   end
-   if server.name == "eslint" then
-      opts.filetypes = {"javascript"}
-   end
-   if server.name == "tsserver" then
-   	opts.filetypes = {"javascript", "typescript"}
-   end
-   if server.name == "pyright" then
-	opts.filetypes = {"python"}
-   end
+local onAttach = function(_, bufnr)
+  vim.bo[bufnr].omnifunc = 'v:lua.vim.lsp.omnifunc'
+  local opts = { buffer = bufnr }
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+  vim.keymap.set('n', '<space>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, opts)
+  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+  vim.keymap.set({'n', 'v'}, '<leader>ca', vim.lsp.buf.code_action, opts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+  vim.keymap.set('n', '<leader>f', function()
+    vim.lsp.buf.format { async = true }
+  end, opts)
+end
 
-   -- opts.on_attach = on_attach
+lspconfig.rust_analyzer.setup {
+  settings = {
+    ['rust-analyzer'] = {},
+    ['pyright'] = { pythonPath = 'python3' },
+  },
+}
 
-  server:setup(opts)
-  -- server:setup({capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())})
-  -- vim.cmd [[ do User LspAttachBuffers ]]
-end)
+lspconfig.lua_ls.setup({
+  on_attach = onAttach,
+  settings = {
+    Lua = {
+      telemetry = { enable = false },
+      workspace = { checkThirdParty = false },
+    },
+  },
+})
 
+lspconfig.tsserver.setup({
+  on_attach = onAttach,
+  filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx' },
+})
+
+lspconfig.emmet_language_server.setup({
+  filetypes = { "css", "eruby", "html", "javascript", "javascriptreact", "less", "sass", "scss", "pug", "typescriptreact" },
+  init_options = {
+    ---@type table<string, string>
+    includeLanguages = {},
+    --- @type string[]
+    excludeLanguages = {},
+    --- @type string[]
+    extensionsPath = {},
+    --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/preferences/)
+    preferences = {},
+    --- @type boolean Defaults to `true`
+    showAbbreviationSuggestions = true,
+    --- @type "always" | "never" Defaults to `"always"`
+    showExpandedAbbreviation = "always",
+    --- @type boolean Defaults to `false`
+    showSuggestionsAsSnippets = false,
+    --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/syntax-profiles/)
+    syntaxProfiles = {},
+    --- @type table<string, string> [Emmet Docs](https://docs.emmet.io/customization/snippets/#variables)
+    variables = {},
+  },
+})
