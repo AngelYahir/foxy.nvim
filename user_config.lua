@@ -1,4 +1,4 @@
 return {
-  logo = "foxy",
+  logo = "nerv",
   theme = "catppuccin-mocha"
 }
