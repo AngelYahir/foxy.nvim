@@ -14,7 +14,7 @@ require("plugins/dashboard")
 require("plugins/treesitter")
 require("plugins/lsp")
 require("plugins/transparent")
-require("plugins/presence")
+--require("plugins/presence")
 require("markview").setup({
     modes = { "n", "i", "no", "c" },
     hybrid_modes = { "i" },
